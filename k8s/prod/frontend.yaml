@@ -1,0 +1,43 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: frontend
+  namespace: books-prod
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: frontend
+  template:
+    metadata:
+      labels:
+        app: frontend
+    spec:
+      containers:
+        - name: frontend
+          image: ghcr.io/your-org/nuxt-nest-learning-frontend:prod
+          ports:
+            - containerPort: 3000
+          resources:
+            requests:
+              cpu: 250m
+              memory: 256Mi
+            limits:
+              cpu: 1
+              memory: 1Gi
+          env:
+            - name: NUXT_PUBLIC_API_BASE_URL
+              value: "https://api.example.com"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: frontend
+  namespace: books-prod
+spec:
+  selector:
+    app: frontend
+  ports:
+    - name: http
+      port: 3000
+      targetPort: 3000

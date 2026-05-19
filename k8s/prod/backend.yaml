@@ -1,0 +1,43 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: backend
+  namespace: books-prod
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: backend
+  template:
+    metadata:
+      labels:
+        app: backend
+    spec:
+      containers:
+        - name: backend
+          image: ghcr.io/your-org/nuxt-nest-learning-backend:prod
+          ports:
+            - containerPort: 4000
+          resources:
+            requests:
+              cpu: 250m
+              memory: 256Mi
+            limits:
+              cpu: 1
+              memory: 1Gi
+          envFrom:
+            - secretRef:
+                name: backend-env
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: backend
+  namespace: books-prod
+spec:
+  selector:
+    app: backend
+  ports:
+    - name: http
+      port: 4000
+      targetPort: 4000

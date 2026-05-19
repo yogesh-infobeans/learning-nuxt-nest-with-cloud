@@ -1,0 +1,25 @@
+{
+  "name": "nuxt-nest-learning-project",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "dev:frontend": "npm --workspace apps/frontend run dev",
+    "dev:backend": "npm --workspace apps/backend run start:dev",
+    "build": "npm run build --workspace apps/frontend && npm run build --workspace apps/backend",
+    "lint": "npm run lint --workspace apps/frontend && npm run lint --workspace apps/backend",
+    "test": "npm run test --workspace apps/backend"
+  },
+  "workspaces": [
+    "apps/*"
+  ],
+  "keywords": [
+    "nuxt",
+    "nest",
+    "elasticsearch",
+    "rabbitmq",
+    "redis"
+  ],
+  "author": "",
+  "license": "MIT",
+  "description": "Learning project with Nuxt frontend, Nest backend, queue/search/cache, and cloud-ready DevOps setup."
+}

@@ -1,0 +1,85 @@
+version: "3.9"
+
+services:
+  postgres:
+    image: postgres:16
+    environment:
+      POSTGRES_USER: books
+      POSTGRES_PASSWORD: books
+      POSTGRES_DB: books_db
+    ports:
+      - "5433:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+  rabbitmq:
+    image: rabbitmq:3-management
+    ports:
+      - "5673:5672"
+      - "15673:15672"
+
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6380:6379"
+
+  elasticsearch:
+    image: docker.elastic.co/elasticsearch/elasticsearch:8.14.3
+    environment:
+      - discovery.type=single-node
+      - xpack.security.enabled=false
+      - ES_JAVA_OPTS=-Xms512m -Xmx512m
+    ports:
+      - "9201:9200"
+      - "9301:9300"
+
+  kibana:
+    image: docker.elastic.co/kibana/kibana:8.14.3
+    environment:
+      - ELASTICSEARCH_HOSTS=http://elasticsearch:9200
+    ports:
+      - "5601:5601"
+    depends_on:
+      - elasticsearch
+
+  backend:
+    build:
+      context: .
+      dockerfile: apps/backend/Dockerfile
+    environment:
+      PORT: 4000
+      DB_HOST: postgres
+      DB_PORT: 5432
+      DB_USERNAME: books
+      DB_PASSWORD: books
+      DB_NAME: books_db
+      RABBITMQ_URL: amqp://guest:guest@rabbitmq:5672
+      RABBITMQ_QUEUE: book_upload_queue
+      REDIS_URL: redis://redis:6379
+      ELASTICSEARCH_NODE: http://elasticsearch:9200
+      ELASTICSEARCH_INDEX: books
+      CACHE_TTL_SECONDS: 120
+      JWT_SECRET: dev-jwt-secret-change-me
+      JWT_EXPIRES_IN: 1d
+    ports:
+      - "4000:4000"
+    depends_on:
+      - postgres
+      - rabbitmq
+      - redis
+      - elasticsearch
+
+  frontend:
+    build:
+      context: .
+      dockerfile: apps/frontend/Dockerfile
+    environment:
+      NUXT_API_BASE_URL: http://backend:4000
+      NUXT_PUBLIC_API_BASE_URL: http://localhost:4000
+    ports:
+      - "3000:3000"
+    depends_on:
+      - backend
+
+volumes:
+  postgres_data:

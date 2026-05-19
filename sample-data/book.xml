@@ -1,0 +1,15 @@
+<book>
+  <title>Distributed Systems for Book Platforms</title>
+  <chapters>
+    <chapter>
+      <title>Queue-Based Ingestion</title>
+      <paragraph>Uploads are accepted by the API and queued for asynchronous parsing.</paragraph>
+      <paragraph>RabbitMQ decouples user-facing latency from heavy parsing operations.</paragraph>
+    </chapter>
+    <chapter>
+      <title>Search and Caching</title>
+      <paragraph>Elasticsearch indexes parsed content and supports full-text search.</paragraph>
+      <paragraph>Redis caches popular books to reduce database reads.</paragraph>
+    </chapter>
+  </chapters>
+</book>
