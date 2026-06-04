@@ -1,6 +1,10 @@
 import type { AuthResponse, AuthUser } from '~/types/auth';
-
-const guestPaths = new Set(['/login', '/register']);
+import {
+  buildAuthHeaders,
+  clearAuthSession,
+  createAuthSession,
+  guestPaths,
+} from '~/utils/auth-session';
 
 export const useAuth = () => {
   const apiBaseUrl = useApiBaseUrl();
@@ -12,13 +16,15 @@ export const useAuth = () => {
   const isAuthenticated = computed(() => Boolean(token.value));
 
   const setSession = (response: AuthResponse) => {
-    token.value = response.accessToken;
-    user.value = response.user;
+    const session = createAuthSession(response);
+    token.value = session.token;
+    user.value = session.user;
   };
 
   const clearSession = () => {
-    token.value = null;
-    user.value = null;
+    const session = clearAuthSession();
+    token.value = session.token;
+    user.value = session.user;
   };
 
   const loadProfile = async () => {
@@ -28,9 +34,7 @@ export const useAuth = () => {
     }
 
     const profile = await $fetch<AuthUser>(`${apiBaseUrl}/auth/me`, {
-      headers: {
-        Authorization: `Bearer ${token.value}`,
-      },
+      headers: buildAuthHeaders(token.value),
     });
     user.value = profile;
     return profile;

@@ -1,15 +1,11 @@
+import { getAuthRedirect } from '~/utils/auth-session';
+
 export default defineNuxtRouteMiddleware(async (to) => {
-  const { guestPaths, isAuthenticated, loadProfile, clearSession } = useAuth();
+  const { isAuthenticated, loadProfile, clearSession } = useAuth();
 
-  if (guestPaths.has(to.path)) {
-    if (isAuthenticated.value) {
-      return navigateTo('/');
-    }
-    return;
-  }
-
-  if (!isAuthenticated.value) {
-    return navigateTo('/login');
+  const redirect = getAuthRedirect(to.path, isAuthenticated.value);
+  if (redirect) {
+    return navigateTo(redirect);
   }
 
   try {
