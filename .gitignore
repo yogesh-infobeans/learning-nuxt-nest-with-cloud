@@ -8,3 +8,8 @@ dist
 coverage
 *.log
 apps/backend/dist
+/test-results/
+/playwright-report/
+/blob-report/
+/playwright/.cache/
+node_modules/playwright-core/.local-browsers

@@ -1,0 +1,49 @@
+---
+description: Keep backend, frontend, and Playwright tests in sync for every feature change
+alwaysApply: true
+---
+
+# Full-stack change workflow
+
+When adding, updating, or removing a feature, change **all affected layers** in the same task/PR. Do not merge UI-only or API-only changes if the other side or tests are left broken or outdated.
+
+## Layer map
+
+| Layer | Location | Unit tests |
+|-------|----------|------------|
+| Backend API | `apps/backend/src/**` | `apps/backend/src/**/*.spec.ts` |
+| Frontend UI | `apps/frontend/pages/**`, `composables/**`, `utils/**` | `apps/frontend/**/*.spec.ts` |
+| E2E (user flows) | `e2e/**/*.spec.ts`, `e2e/helpers/**` | Run via `npm run test:e2e` |
+
+## Required steps for every feature change
+
+1. **Backend** — entity/DTO, service, controller, module wiring, env vars if needed.
+2. **Frontend** — pages, composables, types, `nuxt.config` / env examples if URLs or config change.
+3. **Backend unit tests** — add/update/remove `*.spec.ts` next to the service or in the same domain folder.
+4. **Frontend unit tests** — add/update/remove specs for pure helpers/composables (`utils/`, `composables/`).
+5. **Playwright e2e** — add/update/remove flows in `e2e/` when user-visible behavior or routes change.
+6. **Remove together** — deleting an endpoint, page, or button means deleting its unit and e2e tests too.
+7. **Verify locally** before finishing:
+   - `npm run lint`
+   - `npm run test`
+   - `docker compose up -d --build` then `npm run test:e2e` (when UI/API flows changed)
+
+## What to test where
+
+- **Unit (backend)**: business logic, validation, mocks for DB/queue/search/cache.
+- **Unit (frontend)**: pure functions (`utils/`), auth/session helpers — not full Nuxt SSR unless using `@nuxt/test-utils`.
+- **E2E (Playwright)**: real login, navigation, forms, and API integration through the browser. Prefer `getByRole` / `getByLabel`; avoid fragile `textarea` locators (Vuetify uses a hidden sizer).
+
+## Feature → file hints
+
+- **Auth** — `apps/backend/src/auth/`, `apps/frontend/pages/login.vue`, `register.vue`, `composables/useAuth.ts`, `e2e/auth.spec.ts`, `e2e/helpers/auth.ts`
+- **Books** — `apps/backend/src/books/`, `apps/frontend/pages/index.vue`, `e2e/books.spec.ts`, `e2e/helpers/books.ts`
+- **Search** — `apps/backend/src/search/`, book list/search UI, e2e search steps in `e2e/books.spec.ts`
+
+## PR completion criteria
+
+- [ ] Backend + frontend updated together
+- [ ] Unit tests updated (`npm run test`)
+- [ ] E2E updated if user flow or routes changed (`npm run test:e2e`)
+- [ ] No orphaned tests for removed features
+- [ ] `.env.example` / `docker-compose.yml` updated if new env vars

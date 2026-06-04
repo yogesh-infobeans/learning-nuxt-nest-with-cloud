@@ -7,7 +7,17 @@
     "dev:backend": "npm --workspace apps/backend run start:dev",
     "build": "npm run build --workspace apps/frontend && npm run build --workspace apps/backend",
     "lint": "npm run lint --workspace apps/frontend && npm run lint --workspace apps/backend",
-    "test": "npm run test --workspace apps/backend && npm run test --workspace apps/frontend"
+    "test": "npm run test --workspace apps/backend && npm run test --workspace apps/frontend",
+    "test:ci": "npm run lint && npm run test && npm run build",
+    "verify": "npm run test:ci && npm run test:e2e",
+    "test:e2e:install": "PLAYWRIGHT_BROWSERS_PATH=0 playwright install chromium",
+    "pretest:e2e": "PLAYWRIGHT_BROWSERS_PATH=0 playwright install chromium",
+    "test:e2e": "PLAYWRIGHT_BROWSERS_PATH=0 playwright test",
+    "test:e2e:ui": "PLAYWRIGHT_BROWSERS_PATH=0 playwright test --ui",
+    "test:e2e:headed": "PLAYWRIGHT_BROWSERS_PATH=0 PLAYWRIGHT_SLOW_MO=800 playwright test --headed",
+    "test:e2e:headed:slow": "PLAYWRIGHT_BROWSERS_PATH=0 PLAYWRIGHT_SLOW_MO=1500 playwright test --headed",
+    "test:e2e:debug": "PLAYWRIGHT_BROWSERS_PATH=0 playwright test --headed --debug",
+    "test:e2e:report": "PLAYWRIGHT_BROWSERS_PATH=0 playwright show-report"
   },
   "workspaces": [
     "apps/*"
@@ -21,5 +31,8 @@
   ],
   "author": "",
   "license": "MIT",
-  "description": "Learning project with Nuxt frontend, Nest backend, queue/search/cache, and cloud-ready DevOps setup."
+  "description": "Learning project with Nuxt frontend, Nest backend, queue/search/cache, and cloud-ready DevOps setup.",
+  "devDependencies": {
+    "@playwright/test": "^1.49.1"
+  }
 }
